@@ -490,6 +490,7 @@ dependencies = [
  "axerrno",
  "axfeat",
  "axio",
+ "axsync",
  "kspin",
 ]
 
