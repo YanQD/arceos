@@ -12,3 +12,4 @@ categories.workspace = true
 
 [dependencies]
 axstd = { workspace = true, optional = true }
+arceos_api = { workspace = true, optional = true }
