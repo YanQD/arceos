@@ -1,0 +1,1 @@
+make A=examples/loader ARCH=riscv64 run
