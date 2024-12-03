@@ -14,7 +14,7 @@ const RUN_START: usize = 0xffff_ffc0_8010_0000;
 
 const SYS_HELLO: usize = 1;
 const SYS_PUTCHAR: usize = 2;
-const SYS_TERMINATE: usize = 2;
+const SYS_TERMINATE: usize = 3;
 
 static mut ABI_TABLE: [usize; 16] = [0; 16];
 
@@ -37,11 +37,13 @@ fn abi_terminate() {
 
 #[cfg_attr(feature = "axstd", no_mangle)]
 fn main() {
-    let app_num = 2;
+    let app_num = 1;
 
     let mut app_start = PLASH_START as *const u8;
     
-    // unsafe { *app_start };
+    register_abi(SYS_HELLO, abi_hello as usize);
+    register_abi(SYS_PUTCHAR, abi_putchar as usize);
+    register_abi(SYS_TERMINATE, abi_terminate as usize);
 
     println!("Load {app_num} app to payload...\n");
 
@@ -59,31 +61,16 @@ fn main() {
         run_code.copy_from_slice(content);
         println!("run code {:?}; address [{:?}]", run_code, run_code.as_ptr());
 
-        register_abi(SYS_HELLO, abi_hello as usize);
-        register_abi(SYS_PUTCHAR, abi_putchar as usize);
-        register_abi(SYS_TERMINATE, abi_terminate as usize);
+        println!("Execute app {i} ...");
 
-        let arg0: u8 = b'A';
-
-        println!("Execute App_{i} ...");
         // execute app
         unsafe { core::arch::asm!("
-            li      t0, {abi_num}
-            slli    t0, t0, 3
-            la      t1, {abi_table}
-            add     t1, t1, t0
-            ld      t1, (t1)
-            jalr    t1
-            // li      t2, {run_start}
-            // jalr    t2
-            // j       .",
+            la      a7, {abi_table}
+            li      t2, {run_start}
+            jalr    t2",
             run_start = const RUN_START,
             abi_table = sym ABI_TABLE,
-            //abi_num = const SYS_HELLO,
-            abi_num = const SYS_TERMINATE,
-            in("a0") arg0,
         )}
-        println!("Execute App_{i} done\n");
 
         app_start = unsafe { app_start.add(app_size + 1) };
     });
