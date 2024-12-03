@@ -1,1 +1,1 @@
-make A=examples/loader ARCH=riscv64 run
+make A=examples/loader ARCH=riscv64 run QEMU_LOG=y
