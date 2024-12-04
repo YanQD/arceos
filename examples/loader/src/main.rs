@@ -1,7 +1,7 @@
 #![cfg_attr(feature = "axstd", no_std)]
 #![cfg_attr(feature = "axstd", no_main)]
 #![feature(asm_const)]
-    
+
 #[cfg(feature = "axstd")]
 use axstd::{ println, process::exit };
 
@@ -73,8 +73,6 @@ fn main() {
 
         // execute app
         unsafe { core::arch::asm!("
-
-        
             la      a0, {abi_entry}
             li      t2, {run_start}
             jalr    t2",      
